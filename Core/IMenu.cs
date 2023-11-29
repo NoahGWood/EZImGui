@@ -2,7 +2,7 @@
 {
     public interface IMenu
     {
-        public void Render()
+        public void RenderMenu()
         {
 
         }

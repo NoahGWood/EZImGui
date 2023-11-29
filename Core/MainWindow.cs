@@ -3,6 +3,7 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using ImGuiNET;
+using System.ComponentModel;
 
 namespace EZImGui.Core
 {
@@ -72,11 +73,12 @@ namespace EZImGui.Core
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
             ImGuiController.Update(this, (float)args.Time);
             ImGui.DockSpaceOverViewport();
-
+            ImGui.BeginMainMenuBar();
             foreach(IMenu menu in m_Menus)
             {
-                menu.Render();
+                menu.RenderMenu();
             }
+            ImGui.EndMainMenuBar();
             foreach(IPanel panel in m_Panels)
             {
                 panel.Render();
@@ -97,6 +99,11 @@ namespace EZImGui.Core
         {
             base.OnMouseWheel(e);
             ImGuiController.MouseScroll(e.Offset);
+        }
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            App.Stop();
+            base.OnClosing(e);
         }
     }
 }

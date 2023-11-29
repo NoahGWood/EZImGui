@@ -4,6 +4,33 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <Title>Easy Immediate Mode GUI Framework for DotNet</Title>
+    <Authors>NoahGWood</Authors>
+    <Company>NoahGWood</Company>
+    <Description>EZ ImGui is a simple framework for building applications with ImGui.Net
+
+This framework comes with a few more bells and whistles:
+* Built-In Logging
+* Support For Rendering Images
+* Docking Enabled By Default
+* Menu Interfaces
+* Panel Interfaces
+* Image Loading &amp; Rendering
+
+Simply add your panels and menu items to the static App class, and call App.Run()
+
+EZImGui is based on NogginBops Imgui.NET_OpenTK_Sample which is available at: https://github.com/NogginBops/ImGui.NET_OpenTK_Sample</Description>
+    <PackageProjectUrl>https://github.com/NoahGWood/EZImGui</PackageProjectUrl>
+    <OutputType>Library</OutputType>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/NoahGWood/EZImGui</RepositoryUrl>
+    <PackageTags>ImGui; ImGuiNet; imguinet; gui; EZImGui; easy gui; easy; gui;</PackageTags>
+    <PackageReleaseNotes>Initial release, may be a bit buggy</PackageReleaseNotes>
+    <SignAssembly>False</SignAssembly>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,6 +39,18 @@
     <PackageReference Include="Serilog" Version="3.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="StbImageSharp" Version="2.27.13" />
+    <PackageReference Include="YamlDotNet" Version="13.7.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
