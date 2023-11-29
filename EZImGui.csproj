@@ -31,7 +31,7 @@ EZImGui is based on NogginBops Imgui.NET_OpenTK_Sample which is available at: ht
     <PackageTags>ImGui; ImGuiNet; imguinet; gui; EZImGui; easy gui; easy; gui;</PackageTags>
     <PackageReleaseNotes>Initial release, may be a bit buggy</PackageReleaseNotes>
     <SignAssembly>False</SignAssembly>
-    <Version>$(VersionPrefix)1.0.0.1</Version>
+    <Version>$(VersionPrefix)1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
