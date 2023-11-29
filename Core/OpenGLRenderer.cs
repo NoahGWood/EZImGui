@@ -1,5 +1,6 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 using System;
+using System.Diagnostics;
 
 namespace EZImGui.Core
 {
@@ -7,10 +8,10 @@ namespace EZImGui.Core
     {
         public static bool KHRDebugAvailable { get; private set; }
 
-        public static readonly int GLVersion;
-        public static readonly bool CompatibilityProfile;
+        public static int GLVersion;
+        public static bool CompatibilityProfile;
 
-        static OpenGLRenderer()
+        public static void GetOpenGLInfo()
         {
             int major = GL.GetInteger(GetPName.MajorVersion);
             int minor = GL.GetInteger(GetPName.MinorVersion);
@@ -19,7 +20,9 @@ namespace EZImGui.Core
             KHRDebugAvailable = (major == 4 && minor >= 3) || IsExtensionSupported("KHR_Debug");
 
             CompatibilityProfile = (GL.GetInteger((GetPName)All.ContextProfileMask) & (int)All.ContextCompatibilityProfileBit) != 0;
+
         }
+
         public static int GenTexture()
         {
             return GL.GenTexture();
@@ -47,7 +50,11 @@ namespace EZImGui.Core
             int vertex = CompileShader(name, ShaderType.VertexShader, vertexSource);
             int fragment = CompileShader(name, ShaderType.FragmentShader, fragmentSource);
 
+            GL.AttachShader(program, vertex);
+            GL.AttachShader(program, fragment);
+
             GL.LinkProgram(program);
+
             GL.GetProgram(program, GetProgramParameterName.LinkStatus, out int success);
             if(success == 0)
             {
@@ -56,14 +63,17 @@ namespace EZImGui.Core
             }
             GL.DetachShader(program, vertex);
             GL.DetachShader(program, fragment);
+
             GL.DeleteShader(vertex);
             GL.DeleteShader(fragment);
+
             return program;
         }
         public static int CompileShader(string name, ShaderType type, string source)
         {
             int shader = GL.CreateShader(type);
             LabelObject(ObjectLabelIdentifier.Shader, shader, $"Shader: {name}");
+
             GL.ShaderSource(shader, source);
             GL.CompileShader(shader);
 
@@ -75,15 +85,18 @@ namespace EZImGui.Core
             }
             return shader;
         }
+        
         public static void CheckGLError(string title)
         {
             ErrorCode error;
             int i = 1;
-            while((error = GL.GetError()) != ErrorCode.NoError)
+            while ((error = GL.GetError()) != ErrorCode.NoError)
             {
+                Debug.Print($"{title} ({i++}): {error}");
                 Logger.CoreDebug($"{title} ({i++}): {error}");
             }
         }
+
         public static void LabelObject(ObjectLabelIdentifier objectLabelId, int glObject, string name)
         {
             if(KHRDebugAvailable)
@@ -99,37 +112,6 @@ namespace EZImGui.Core
                 if(ext == name) return true;
             }
             return false;
-        }
-
-        public static void SaveState()
-        {
-            // Get intial state.
-            int prevVAO = GL.GetInteger(GetPName.VertexArrayBinding);
-            int prevArrayBuffer = GL.GetInteger(GetPName.ArrayBufferBinding);
-            int prevProgram = GL.GetInteger(GetPName.CurrentProgram);
-            bool prevBlendEnabled = GL.GetBoolean(GetPName.Blend);
-            bool prevScissorTestEnabled = GL.GetBoolean(GetPName.ScissorTest);
-            int prevBlendEquationRgb = GL.GetInteger(GetPName.BlendEquationRgb);
-            int prevBlendEquationAlpha = GL.GetInteger(GetPName.BlendEquationAlpha);
-            int prevBlendFuncSrcRgb = GL.GetInteger(GetPName.BlendSrcRgb);
-            int prevBlendFuncSrcAlpha = GL.GetInteger(GetPName.BlendSrcAlpha);
-            int prevBlendFuncDstRgb = GL.GetInteger(GetPName.BlendDstRgb);
-            int prevBlendFuncDstAlpha = GL.GetInteger(GetPName.BlendDstAlpha);
-            bool prevCullFaceEnabled = GL.GetBoolean(GetPName.CullFace);
-            bool prevDepthTestEnabled = GL.GetBoolean(GetPName.DepthTest);
-            int prevActiveTexture = GL.GetInteger(GetPName.ActiveTexture);
-            GL.ActiveTexture(TextureUnit.Texture0);
-            int prevTexture2D = GL.GetInteger(GetPName.TextureBinding2D);
-
-            if (GLVersion <= 310 || CompatibilityProfile)
-            {
-                GL.PolygonMode(MaterialFace.Front, PolygonMode.Fill);
-                GL.PolygonMode(MaterialFace.Back, PolygonMode.Fill);
-            }
-            else
-            {
-                GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
-            }
         }
     }
 }

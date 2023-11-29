@@ -28,6 +28,7 @@ namespace EZImGui.Core
         public static void CoreDebug(string message)
         {
             CoreLog.Debug(message);
+            Console.WriteLine(message);
         }
     }
 }

@@ -16,6 +16,14 @@ namespace EZImGui
         {
             Settings = settings;
         }
+        public static void AddMenu(IMenu menu)
+        {
+            MainWindow.AddMenu(menu);
+        }
+        public static void AddPanel(IPanel panel)
+        {
+            MainWindow.AddPanel(panel);
+        }
         public static void Start()
         {
             MainWindow.Run();
