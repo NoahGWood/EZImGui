@@ -31,6 +31,12 @@ namespace EZImGui.Core
             IntPtr context = ImGui.CreateContext();
             ImGui.SetCurrentContext(context);
             IO = ImGui.GetIO();
+            IO.Fonts.AddFontDefault();
+            
+            AddBackendFlag(ImGuiBackendFlags.RendererHasVtxOffset);
+            AddConfigFlag(ImGuiConfigFlags.DockingEnable);
+            AddConfigFlag(ImGuiConfigFlags.ViewportsEnable);
+
             Initialize();
             SetPerFrameImGuiData(1f / 60f);
             ImGui.NewFrame();
@@ -161,11 +167,10 @@ namespace EZImGui.Core
             }
 
             // Setup orthographic projection matrix into our constant buffer
-            ImGuiIOPtr io = ImGui.GetIO();
             Matrix4 mvp = Matrix4.CreateOrthographicOffCenter(
             0.0f,
-                io.DisplaySize.X,
-                io.DisplaySize.Y,
+                IO.DisplaySize.X,
+                IO.DisplaySize.Y,
                 0.0f,
                 -1.0f,
                 1.0f);
@@ -178,7 +183,7 @@ namespace EZImGui.Core
             GL.BindVertexArray(m_VertexArray);
             OpenGLRenderer.CheckGLError("VAO");
 
-            draw_data.ScaleClipRects(io.DisplayFramebufferScale);
+            draw_data.ScaleClipRects(IO.DisplayFramebufferScale);
 
             GL.Enable(EnableCap.Blend);
             GL.Enable(EnableCap.ScissorTest);
@@ -216,7 +221,7 @@ namespace EZImGui.Core
                         GL.Scissor((int)clip.X, m_WindowHeight - (int)clip.W, (int)(clip.Z - clip.X), (int)(clip.W - clip.Y));
                         OpenGLRenderer.CheckGLError("Scissor");
 
-                        if ((io.BackendFlags & ImGuiBackendFlags.RendererHasVtxOffset) != 0)
+                        if ((IO.BackendFlags & ImGuiBackendFlags.RendererHasVtxOffset) != 0)
                         {
                             GL.DrawElementsBaseVertex(PrimitiveType.Triangles, (int)pcmd.ElemCount, DrawElementsType.UnsignedShort, (IntPtr)(pcmd.IdxOffset * sizeof(ushort)), unchecked((int)pcmd.VtxOffset));
                         }
@@ -287,10 +292,8 @@ namespace EZImGui.Core
         }
         static internal void MouseScroll(Vector2 offset)
         {
-            ImGuiIOPtr io = ImGui.GetIO();
-
-            io.MouseWheel = offset.Y;
-            io.MouseWheelH = offset.X;
+            IO.MouseWheel = offset.Y;
+            IO.MouseWheelH = offset.X;
         }
 
         #endregion Private
@@ -334,7 +337,6 @@ void main()
         /// </summary>
         public static void RecreateFontDeviceTexture()
         {
-            ImGuiIOPtr io = ImGui.GetIO();
             IO.Fonts.GetTexDataAsRGBA32(out IntPtr pixels, out int width, out int height, out int bytesPerPixel);
 
             int mips = (int)Math.Floor(Math.Log(Math.Max(width, height), 2));
