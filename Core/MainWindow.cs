@@ -17,17 +17,18 @@ namespace EZImGui.Core
 
         private int m_FramebufferTexture;
         private int m_RectVAO;
+        private ImGuiController ImGuiController;
 
         public MainWindow(string title, int  width, int height)
             : base(GameWindowSettings.Default, new NativeWindowSettings()
             {
                 Title = title,
-                Size = new OpenTK.Mathematics.Vector2i(width, height),
-                StartFocused = true,
+                Size = new Vector2i(width, height),
                 StartVisible = true,
-                WindowState = OpenTK.Windowing.Common.WindowState.Normal,
-                API = OpenTK.Windowing.Common.ContextAPI.OpenGL,
-                Profile = OpenTK.Windowing.Common.ContextProfile.Core,
+                StartFocused = true,
+                WindowState = WindowState.Normal,
+                API = ContextAPI.OpenGL,
+                Profile = ContextProfile.Core,
                 APIVersion = new Version(3,3)
             })
        {
@@ -46,17 +47,20 @@ namespace EZImGui.Core
 
         protected override void OnLoad()
         {
-            m_FramebufferTexture = OpenGLRenderer.GenTexture();
+            m_FramebufferTexture = GL.GenTexture();
             GL.ClearColor(new Color4(0.5f, 0.5f, 0.5f, 1.0f));
             GL.LineWidth(2.0f);
             GL.PointSize(5f);
-            ImGuiController.WindowResized(ClientSize.X, ClientSize.Y);
+            ImGuiController = new ImGuiController(ClientSize.X, ClientSize.Y);
+            OpenGLRenderer.CheckGLError("OnLoad");
+
             base.OnLoad();
         }
         protected override void OnResize(ResizeEventArgs e)
         {
             m_Height = e.Height;
             m_Width = e.Width;
+
             GL.DeleteFramebuffer(m_FramebufferTexture);
             GL.Viewport(0,0, ClientSize.X, ClientSize.Y);
             ImGuiController.WindowResized(ClientSize.X, ClientSize.Y);
@@ -64,27 +68,29 @@ namespace EZImGui.Core
         }
         protected override void OnRenderFrame(FrameEventArgs args)
         {
-            GL.ClearColor(new Color4(0, 32, 48, 255));
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
-            GL.ActiveTexture(TextureUnit.Texture0);
-            GL.BindTexture(TextureTarget.Texture2D, m_FramebufferTexture);
-            GL.BindVertexArray(m_RectVAO);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 999);
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
             ImGuiController.Update(this, (float)args.Time);
+
             ImGui.DockSpaceOverViewport();
-            ImGui.BeginMainMenuBar();
-            foreach(IMenu menu in m_Menus)
+
+            if (ImGui.BeginMainMenuBar())
             {
-                menu.RenderMenu();
+                foreach (IMenu menu in m_Menus)
+                {
+                    menu.RenderMenu();
+                }
+
+                ImGui.EndMainMenuBar();
             }
-            ImGui.EndMainMenuBar();
-            foreach(IPanel panel in m_Panels)
+
+            foreach (IPanel panel in m_Panels)
             {
                 panel.Render();
             }
+            
             ImGuiController.Render();
+            
             OpenGLRenderer.CheckGLError("End of frame");
+
             Context.SwapBuffers();
             base.OnRenderFrame(args);
         }
